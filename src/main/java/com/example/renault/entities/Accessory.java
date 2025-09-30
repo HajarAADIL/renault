@@ -1,5 +1,6 @@
 package com.example.renault.entities;
 
+import com.example.renault.enums.AccessoryType;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -17,7 +18,8 @@ public class Accessory {
 
     private BigDecimal price;
 
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private AccessoryType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicule_id")
@@ -55,11 +57,11 @@ public class Accessory {
         this.price = price;
     }
 
-    public String getType() {
+    public AccessoryType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(AccessoryType type) {
         this.type = type;
     }
 
