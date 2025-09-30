@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -23,11 +24,15 @@ public class GarageController {
     }
 
     @PostMapping
-    public ResponseEntity<Garage> create(@RequestBody Garage garage){
-        Garage created = garageService.create(garage);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(created);
+    public ResponseEntity<?> create(@RequestBody Garage garage){
+        try {
+            Garage created = garageService.create(garage);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(created);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PutMapping("/{id}")

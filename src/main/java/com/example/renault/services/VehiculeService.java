@@ -15,7 +15,9 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class VehiculeService {
-    
+
+    public static final int MAX_VEHICULE = 50;
+
     private final VehiculeRepository vehiculeRepository;
 
     public VehiculeService(VehiculeRepository vehiculeRepository) {
@@ -23,6 +25,10 @@ public class VehiculeService {
     }
 
     public Vehicule create(Vehicule vehicule) {
+        long vehiculeNumber = vehiculeRepository.countByGarageId(vehicule.getGarage().getId());
+        if(vehiculeNumber >= MAX_VEHICULE)
+            throw new IllegalArgumentException(
+                    String.format("The garage %s has reached the maximum number of vehicles.", vehicule.getGarage().getName()));
         return vehiculeRepository.save(vehicule);
     }
 
