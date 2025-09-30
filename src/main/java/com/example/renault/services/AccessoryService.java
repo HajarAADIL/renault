@@ -3,11 +3,13 @@ package com.example.renault.services;
 import com.example.renault.entities.Accessory;
 import com.example.renault.repositories.AccessoryRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class AccessoryService {
 
     private final AccessoryRepository accessoryRepository;
@@ -20,8 +22,8 @@ public class AccessoryService {
         return accessoryRepository.save(accessory);
     }
 
-    public Accessory update(Accessory accessory) {
-        return accessoryRepository.findById(accessory.getId())
+    public Optional<Accessory> update(Long id, Accessory accessory) {
+        return accessoryRepository.findById(id)
                 .map(old -> {
                     old.setType(accessory.getType());
                     old.setPrice(accessory.getPrice());
@@ -30,20 +32,18 @@ public class AccessoryService {
                     old.setVehicule(accessory.getVehicule());
 
                     return accessoryRepository.save(old);
-                })
-                .orElseThrow(() -> new IllegalArgumentException("Accessory not found"));
+                });
     }
 
-    public void delete(Long id) {
-        Optional<Accessory> found = accessoryRepository.findById(id);
-
-        if(found.isEmpty())
-            throw  new IllegalArgumentException("Accessory not found");
-
-        accessoryRepository.deleteById(id);
+    public boolean delete(Long id) {
+        if (accessoryRepository.existsById(id)) {
+            accessoryRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
-    public List<Accessory> finfByGarageId(Long garageId) {
+    public List<Accessory> findByVehiculeId(Long garageId) {
         return accessoryRepository.findByVehiculeId(garageId);
     }
 }

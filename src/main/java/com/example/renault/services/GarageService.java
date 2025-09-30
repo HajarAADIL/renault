@@ -3,6 +3,8 @@ package com.example.renault.services;
 import com.example.renault.entities.Garage;
 import com.example.renault.enums.FuelType;
 import com.example.renault.repositories.GarageRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +25,8 @@ public class GarageService {
         return garageRepository.save(garage);
     }
 
-    public Garage update(Garage garage) {
-        return garageRepository.findById(garage.getId())
+    public Optional<Garage> update(Long id, Garage garage) {
+        return garageRepository.findById(id)
                 .map(old -> {
                     old.setName(garage.getName());
                     old.setAddress(garage.getAddress());
@@ -34,26 +36,23 @@ public class GarageService {
                     old.setVehicules(garage.getVehicules());
 
                     return garageRepository.save(old);
-                })
-                .orElseThrow(() -> new IllegalArgumentException("garage not found"));
+                });
     }
 
-    public void delete(Long id) {
-        Optional<Garage> found = garageRepository.findById(id);
-
-        if(found.isEmpty())
-            throw  new IllegalArgumentException("garage not found");
-
-        garageRepository.deleteById(id);
+    public boolean delete(Long id) {
+        if (garageRepository.existsById(id)) {
+            garageRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
-    public Garage findById(Long id){
-        return garageRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("garage not found"));
+    public Optional<Garage> findById(Long id){
+        return garageRepository.findById(id);
     }
 
-    public List<Garage> findAll() {
-        return garageRepository.findAll();
+    public Page<Garage> findAll(Pageable pageable) {
+        return garageRepository.findAll(pageable);
     }
 
     public List<Garage> findGarageByVehiculeType(FuelType fuelType){
