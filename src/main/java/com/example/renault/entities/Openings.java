@@ -16,6 +16,8 @@ public class Openings {
     private DayOfWeek dayOfWeek;
 
     @ElementCollection
+    @CollectionTable(name = "openings_opening_times",
+            joinColumns = @JoinColumn(name = "opening_time_id"))
     private List<OpeningTime> openingTimes;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -39,7 +39,7 @@ class GarageRepositoryTest {
         o.setDayOfWeek(DayOfWeek.MONDAY);
         o.setOpeningTimes(List.of(ot));
 
-        garage.setHoraires(List.of(o));
+        garage.setOpeningTimes(List.of(o));
 
         //Vehicule
         garage.setVehicules(List.of(new Vehicule()));
@@ -55,21 +55,21 @@ class GarageRepositoryTest {
         assertThat(expected.get().getAddress()).isEqualTo("Bouskoura");
         assertThat(expected.get().getEmail()).isEqualTo("bouskoura@renault.com");
         assertThat(expected.get().getPhone()).isEqualTo("+212 666555555");
-        assertThat(expected.get().getHoraires()).hasSize(1);
-        assertThat(expected.get().getHoraires().get(0).getDayOfWeek()).isEqualTo(DayOfWeek.MONDAY);
+        assertThat(expected.get().getOpeningTimes()).hasSize(1);
+        assertThat(expected.get().getOpeningTimes().get(0).getDayOfWeek()).isEqualTo(DayOfWeek.MONDAY);
         assertThat(expected.get()
-                .getHoraires()
+                .getOpeningTimes()
                 .get(0)
                 .getOpeningTimes()).hasSize(1);
 
         assertThat(expected.get()
-                .getHoraires()
+                .getOpeningTimes()
                 .get(0)
                 .getOpeningTimes()
                 .get(0).getStartTime()).isEqualTo(LocalTime.of(9,0));
 
         assertThat(expected.get()
-                .getHoraires()
+                .getOpeningTimes()
                 .get(0)
                 .getOpeningTimes()
                 .get(0).getEndTime()).isEqualTo(LocalTime.MIDNIGHT);

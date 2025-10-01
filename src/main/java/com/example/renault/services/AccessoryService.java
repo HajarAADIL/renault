@@ -1,7 +1,12 @@
 package com.example.renault.services;
 
+import com.example.renault.dto.AccessoryDTO;
 import com.example.renault.entities.Accessory;
+import com.example.renault.entities.Vehicule;
+import com.example.renault.mapper.AccessoryMapper;
 import com.example.renault.repositories.AccessoryRepository;
+import com.example.renault.repositories.VehiculeRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,25 +18,39 @@ import java.util.Optional;
 public class AccessoryService {
 
     private final AccessoryRepository accessoryRepository;
+    private final VehiculeRepository vehiculeRepository;
+    private final AccessoryMapper accessoryMapper;
 
-    public AccessoryService(AccessoryRepository accessoryRepository) {
+    public AccessoryService(AccessoryRepository accessoryRepository,
+                            VehiculeRepository vehiculeRepository,
+                            AccessoryMapper accessoryMapper) {
         this.accessoryRepository = accessoryRepository;
+        this.vehiculeRepository = vehiculeRepository;
+        this.accessoryMapper = accessoryMapper;
     }
 
-    public Accessory create(Accessory accessory) {
-        return accessoryRepository.save(accessory);
+    public AccessoryDTO create(AccessoryDTO accessoryDto) {
+        Vehicule vehicule = vehiculeRepository.findById(accessoryDto.vehiculeId())
+                .orElseThrow(() -> new EntityNotFoundException("Vehicule not found"));
+
+        Accessory accessory = accessoryMapper.toEntity(accessoryDto);
+        accessory.setVehicule(vehicule);
+        return accessoryMapper.toDTO(accessoryRepository.save(accessory));
     }
 
-    public Optional<Accessory> update(Long id, Accessory accessory) {
+    public Optional<AccessoryDTO> update(Long id, AccessoryDTO accessoryDto) {
+        Vehicule vehicule = vehiculeRepository.findById(accessoryDto.vehiculeId())
+                .orElseThrow(() -> new EntityNotFoundException("Vehicule not found"));
+
         return accessoryRepository.findById(id)
                 .map(old -> {
-                    old.setType(accessory.getType());
-                    old.setPrice(accessory.getPrice());
-                    old.setName(accessory.getName());
-                    old.setDescription(accessory.getDescription());
-                    old.setVehicule(accessory.getVehicule());
+                    old.setType(accessoryDto.type());
+                    old.setPrice(accessoryDto.price());
+                    old.setName(accessoryDto.name());
+                    old.setDescription(accessoryDto.description());
+                    old.setVehicule(vehicule);
 
-                    return accessoryRepository.save(old);
+                    return accessoryMapper.toDTO(accessoryRepository.save(old));
                 });
     }
 
@@ -43,7 +62,7 @@ public class AccessoryService {
         return false;
     }
 
-    public List<Accessory> findByVehiculeId(Long garageId) {
-        return accessoryRepository.findByVehiculeId(garageId);
+    public List<AccessoryDTO> findByVehiculeId(Long garageId) {
+        return accessoryMapper.toDTO(accessoryRepository.findByVehiculeId(garageId));
     }
 }

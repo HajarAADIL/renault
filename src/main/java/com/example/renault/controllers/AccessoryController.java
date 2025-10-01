@@ -1,5 +1,6 @@
 package com.example.renault.controllers;
 
+import com.example.renault.dto.AccessoryDTO;
 import com.example.renault.entities.Accessory;
 import com.example.renault.services.AccessoryService;
 import org.springframework.http.HttpStatus;
@@ -18,15 +19,15 @@ public class AccessoryController {
     }
 
     @PostMapping
-    public ResponseEntity<Accessory> create(@RequestBody Accessory accessory){
-        Accessory created = accessoryService.create(accessory);
+    public ResponseEntity<AccessoryDTO> create(@RequestBody AccessoryDTO accessory){
+        AccessoryDTO created = accessoryService.create(accessory);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(created);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Accessory> update(@PathVariable Long id, @RequestBody Accessory accessory){
+    public ResponseEntity<AccessoryDTO> update(@PathVariable Long id, @RequestBody AccessoryDTO accessory){
         return accessoryService.update(id, accessory)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -40,7 +41,7 @@ public class AccessoryController {
     }
 
     @GetMapping("/vehicule/{id}")
-    public ResponseEntity<List<Accessory>> searchByVehicule(@PathVariable Long id){
+    public ResponseEntity<List<AccessoryDTO>> searchByVehicule(@PathVariable Long id){
         return ResponseEntity.ok(accessoryService.findByVehiculeId(id));
     }
 

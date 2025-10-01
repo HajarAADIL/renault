@@ -11,6 +11,13 @@ public class OpeningTime {
 
     private LocalTime endTime ;
 
+    public OpeningTime() {}
+
+    public OpeningTime(LocalTime startTime, LocalTime endTime) {
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
     public LocalTime getStartTime() {
         return startTime;
     }

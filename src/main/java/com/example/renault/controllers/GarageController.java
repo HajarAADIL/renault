@@ -1,7 +1,9 @@
 package com.example.renault.controllers;
 
+import com.example.renault.dto.GarageDTO;
 import com.example.renault.entities.Garage;
 import com.example.renault.enums.FuelType;
+import com.example.renault.mapper.GarageMapper;
 import com.example.renault.services.GarageService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,27 +20,30 @@ import java.util.Map;
 public class GarageController {
 
     private final GarageService garageService;
+    private final GarageMapper garageMapper;
 
-    public GarageController(GarageService garageService){
+    public GarageController(GarageService garageService,
+                            GarageMapper garageMapper){
         this.garageService = garageService;
+        this.garageMapper = garageMapper;
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody Garage garage){
+    public ResponseEntity<?> create(@RequestBody GarageDTO garage){
         try {
-            Garage created = garageService.create(garage);
+            Garage created = garageService.create(garageMapper.toEntity(garage));
             return ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(created);
+                    .body(garageMapper.toDTO(created));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Garage> update(@PathVariable Long id, @RequestBody Garage garage){
-        return garageService.update(id, garage)
-                .map(ResponseEntity::ok)
+    public ResponseEntity<GarageDTO> update(@PathVariable Long id, @RequestBody GarageDTO garage){
+        return garageService.update(id, garageMapper.toEntity(garage))
+                .map(updated -> ResponseEntity.ok(garageMapper.toDTO(updated)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -50,24 +55,30 @@ public class GarageController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Garage> searchById(@PathVariable Long id){
+    public ResponseEntity<GarageDTO> searchById(@PathVariable Long id){
         return garageService.findById(id)
-                .map(ResponseEntity::ok)
+                .map(found -> ResponseEntity.ok(garageMapper.toDTO(found)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping
-    public ResponseEntity<Page<Garage>> searchPaginatedSorted(Pageable pageable){
-        return ResponseEntity.ok(garageService.findAll(pageable));
+    public ResponseEntity<Page<GarageDTO>> searchPaginatedSorted(Pageable pageable){
+        Page<GarageDTO> result = garageService.findAll(pageable)
+                .map(garageMapper::toDTO);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/vehicule/{fuelType}")
-    public ResponseEntity<List<Garage>> searchByVehiculeType(@PathVariable FuelType fuelType){
-        return ResponseEntity.ok(garageService.findGarageByVehiculeType(fuelType));
+    public ResponseEntity<List<GarageDTO>> searchByVehiculeType(@PathVariable FuelType fuelType){
+        List<GarageDTO> result = garageService.findGarageByVehiculeType(fuelType)
+                .stream().map(garageMapper::toDTO).toList();
+        return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/accessory/{id}")
-    public ResponseEntity<List<Garage>> searchByVehiculeType(@PathVariable Long accessoryId){
-        return ResponseEntity.ok(garageService.findGaragesByAccessory(accessoryId));
+    @GetMapping("/accessory/{accessoryName}")
+    public ResponseEntity<List<GarageDTO>> searchByVehiculeAccessory(@PathVariable String accessoryName){
+        List<GarageDTO> result = garageService.findGaragesByAccessory(accessoryName)
+                .stream().map(garageMapper::toDTO).toList();
+        return ResponseEntity.ok(result);
     }
 }

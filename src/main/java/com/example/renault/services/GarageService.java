@@ -32,8 +32,12 @@ public class GarageService {
                     old.setAddress(garage.getAddress());
                     old.setEmail(garage.getEmail());
                     old.setPhone(garage.getPhone());
-                    old.setHoraires(garage.getHoraires());
                     old.setVehicules(garage.getVehicules());
+                    old.getOpeningTimes().clear();
+
+                    if (garage.getOpeningTimes() != null) {
+                        garage.getOpeningTimes().forEach(old::addOpening);
+                    }
 
                     return garageRepository.save(old);
                 });
@@ -56,11 +60,11 @@ public class GarageService {
     }
 
     public List<Garage> findGarageByVehiculeType(FuelType fuelType){
-        return garageRepository.findByFuelType(fuelType.name());
+        return garageRepository.findByFuelType(fuelType);
     }
 
-    public List<Garage> findGaragesByAccessory(Long accessoryId){
-        return garageRepository.findByAccessoryId(accessoryId);
+    public List<Garage> findGaragesByAccessory(String accessoryName){
+        return garageRepository.findByAccessoryId(accessoryName);
     }
 
 
