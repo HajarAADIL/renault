@@ -1,16 +1,12 @@
 package com.example.renault.repositories;
 
 import com.example.renault.entities.Accessory;
-import com.example.renault.entities.Accessory;
 import com.example.renault.enums.AccessoryType;
-import com.example.renault.enums.FuelType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
