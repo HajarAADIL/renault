@@ -59,7 +59,7 @@ public class VehiculeService {
         String eventMessage = String.format("{\"id\":%d,\"model\":\"%s\",\"brand\":\"%s\",\"type\":%s,\"garageId\":%d}",
                 created.getId(), created.getFabricationDate(), created.getBrand(), created.getFuelType().name(), created.getGarage().getId());
 
-        //kafkaTemplate.send("vehicule-created", eventMessage);
+        kafkaTemplate.send("vehicule-created", eventMessage);
 
         return vehiculeMapper.toDTO(created);
 
