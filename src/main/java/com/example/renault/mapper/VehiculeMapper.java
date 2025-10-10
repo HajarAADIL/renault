@@ -1,6 +1,6 @@
 package com.example.renault.mapper;
 import com.example.renault.dto.VehiculeDTO;
-import com.example.renault.entities.Vehicule;
+import com.example.renault.entities.VehiculeEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -16,7 +16,7 @@ public class VehiculeMapper {
         this.accessoryMapper = accessoryMapper;
     }
 
-    public VehiculeDTO toDTO(Vehicule vehicule) {
+    public VehiculeDTO toDTO(VehiculeEntity vehicule) {
         return new VehiculeDTO(
                 vehicule.getId(),
                 vehicule.getBrand(),
@@ -27,15 +27,15 @@ public class VehiculeMapper {
         );
     }
 
-    public Vehicule toEntity(VehiculeDTO dto) {
-        Vehicule v = new Vehicule();
+    public VehiculeEntity toEntity(VehiculeDTO dto) {
+        VehiculeEntity v = new VehiculeEntity();
         v.setId(dto.id());
         v.setBrand(dto.brand());
         v.setFabricationDate(dto.fabricationDate());
         v.setFuelType(dto.fuelType());
         return v;
     }
-    public List<VehiculeDTO> toDTO(List<Vehicule> vehicules) {
+    public List<VehiculeDTO> toDTO(List<VehiculeEntity> vehicules) {
        if(CollectionUtils.isEmpty(vehicules)) return new ArrayList<>();
        return vehicules.stream().map(this::toDTO).toList();
     }

@@ -1,7 +1,7 @@
 package com.example.renault.mapper;
 
 import com.example.renault.dto.AccessoryDTO;
-import com.example.renault.entities.Accessory;
+import com.example.renault.entities.AccessoryEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -10,7 +10,7 @@ import java.util.List;
 
 @Component
 public class AccessoryMapper {
-    public AccessoryDTO toDTO(Accessory accessory) {
+    public AccessoryDTO toDTO(AccessoryEntity accessory) {
         return new AccessoryDTO(
                 accessory.getId(),
                 accessory.getName(),
@@ -21,8 +21,8 @@ public class AccessoryMapper {
         );
     }
 
-    public Accessory toEntity(AccessoryDTO dto) {
-        Accessory a = new Accessory();
+    public AccessoryEntity toEntity(AccessoryDTO dto) {
+        AccessoryEntity a = new AccessoryEntity();
         a.setId(dto.id());
         a.setName(dto.name());
         a.setDescription(dto.description());
@@ -30,7 +30,7 @@ public class AccessoryMapper {
         a.setType(dto.type());
         return a;
     }
-    public List<AccessoryDTO> toDTO(List<Accessory> accessorys) {
+    public List<AccessoryDTO> toDTO(List<AccessoryEntity> accessorys) {
         if(CollectionUtils.isEmpty(accessorys)) return new ArrayList<>();
         return accessorys.stream().map(this::toDTO).toList();
     }

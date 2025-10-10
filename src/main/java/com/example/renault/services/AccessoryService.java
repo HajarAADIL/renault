@@ -1,8 +1,8 @@
 package com.example.renault.services;
 
 import com.example.renault.dto.AccessoryDTO;
-import com.example.renault.entities.Accessory;
-import com.example.renault.entities.Vehicule;
+import com.example.renault.entities.AccessoryEntity;
+import com.example.renault.entities.VehiculeEntity;
 import com.example.renault.mapper.AccessoryMapper;
 import com.example.renault.repositories.AccessoryRepository;
 import com.example.renault.repositories.VehiculeRepository;
@@ -30,16 +30,16 @@ public class AccessoryService {
     }
 
     public AccessoryDTO create(AccessoryDTO accessoryDto) {
-        Vehicule vehicule = vehiculeRepository.findById(accessoryDto.vehiculeId())
+        VehiculeEntity vehicule = vehiculeRepository.findById(accessoryDto.vehiculeId())
                 .orElseThrow(() -> new EntityNotFoundException("Vehicule not found"));
 
-        Accessory accessory = accessoryMapper.toEntity(accessoryDto);
+        AccessoryEntity accessory = accessoryMapper.toEntity(accessoryDto);
         accessory.setVehicule(vehicule);
         return accessoryMapper.toDTO(accessoryRepository.save(accessory));
     }
 
     public Optional<AccessoryDTO> update(Long id, AccessoryDTO accessoryDto) {
-        Vehicule vehicule = vehiculeRepository.findById(accessoryDto.vehiculeId())
+        VehiculeEntity vehicule = vehiculeRepository.findById(accessoryDto.vehiculeId())
                 .orElseThrow(() -> new EntityNotFoundException("Vehicule not found"));
 
         return accessoryRepository.findById(id)
@@ -54,13 +54,13 @@ public class AccessoryService {
                 });
     }
 
-    public boolean delete(Long id) {
-        if (accessoryRepository.existsById(id)) {
-            accessoryRepository.deleteById(id);
-            return true;
-        }
-        return false;
+    public void delete(Long id) {
+        AccessoryEntity accessory = accessoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Accessory not found with id " + id));
+        accessoryRepository.delete(accessory);
     }
+
 
     public List<AccessoryDTO> findByVehiculeId(Long garageId) {
         return accessoryMapper.toDTO(accessoryRepository.findByVehiculeId(garageId));

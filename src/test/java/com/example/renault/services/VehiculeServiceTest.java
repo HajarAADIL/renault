@@ -1,7 +1,7 @@
 package com.example.renault.services;
 
-import com.example.renault.entities.Garage;
-import com.example.renault.entities.Vehicule;
+import com.example.renault.entities.GarageEntity;
+import com.example.renault.entities.VehiculeEntity;
 import com.example.renault.repositories.VehiculeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,31 +33,31 @@ public class VehiculeServiceTest {
     void testFindVehiculeByModelGroupByGarage() {
 
         String brand = "MEGANE";
-        Garage garage1 = new Garage();
+        GarageEntity garage1 = new GarageEntity();
         garage1.setId(1L);
         garage1.setName("Garage1");
 
-        Garage garage2 = new Garage();
+        GarageEntity garage2 = new GarageEntity();
         garage2.setId(2L);
         garage2.setName("Garage2");
 
-        Vehicule v1 = new Vehicule();
+        VehiculeEntity v1 = new VehiculeEntity();
         v1.setBrand(brand);
         v1.setGarage(garage1);
 
-        Vehicule v2 = new Vehicule();
+        VehiculeEntity v2 = new VehiculeEntity();
         v2.setBrand(brand);
         v2.setGarage(garage1);
 
-        Vehicule v3 = new Vehicule();
+        VehiculeEntity v3 = new VehiculeEntity();
         v3.setBrand(brand);
         v3.setGarage(garage2);
 
-        List<Vehicule> vehicules = Arrays.asList(v1, v2, v3);
+        List<VehiculeEntity> vehicules = Arrays.asList(v1, v2, v3);
 
         when(vehiculeRepository.findByBrand(brand)).thenReturn(vehicules);
 
-        Map<Garage, List<Vehicule>> result = vehiculeService.findVehiculeByModelGroupByGarage(brand);
+        Map<GarageEntity, List<VehiculeEntity>> result = vehiculeService.findVehiculeByModelGroupByGarage(brand);
 
         assertThat(result).hasSize(2);
         assertThat(result.get(garage1)).containsExactlyInAnyOrder(v1, v2);

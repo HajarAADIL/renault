@@ -1,7 +1,7 @@
 package com.example.renault.integration;
 
 
-import com.example.renault.entities.Garage;
+import com.example.renault.entities.GarageEntity;
 import com.example.renault.repositories.GarageRepository;
 import com.example.renault.services.GarageService;
 import org.junit.jupiter.api.Assertions;
@@ -28,9 +28,9 @@ public class GarageServiceIT {
 
     @Test
     void testAddGarage() {
-        Garage garage = new Garage();
+        GarageEntity garage = new GarageEntity();
         garage.setName("Bouskoura Garage");
-        Garage saved = garageService.create(garage);
+        GarageEntity saved = garageService.create(garage);
 
         Assertions.assertNotNull(saved.getId());
         Assertions.assertEquals("Bouskoura Garage", saved.getName());
@@ -38,11 +38,11 @@ public class GarageServiceIT {
 
     @Test
     void testGetGarageById() {
-        Garage garage = new Garage();
+        GarageEntity garage = new GarageEntity();
         garage.setName("Bouskoura Garage");
-        Garage saved = garageRepository.save(garage);
+        GarageEntity saved = garageRepository.save(garage);
 
-        Optional<Garage> result = garageService.findById(saved.getId());
+        Optional<GarageEntity> result = garageService.findById(saved.getId());
 
         Assertions.assertTrue(result.isPresent());
         Assertions.assertEquals("Bouskoura Garage", result.get().getName());

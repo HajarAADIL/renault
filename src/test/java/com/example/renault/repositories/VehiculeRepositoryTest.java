@@ -1,8 +1,8 @@
 package com.example.renault.repositories;
 
 import com.example.renault.entities.*;
-import com.example.renault.entities.Vehicule;
-import com.example.renault.enums.FuelType;
+import com.example.renault.entities.VehiculeEntity;
+import com.example.renault.enums.FuelTypeEnum;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -22,22 +22,22 @@ public class VehiculeRepositoryTest {
     @Test
     void testCreateVehicule(){
 
-        Vehicule vehicule = new Vehicule();
+        VehiculeEntity vehicule = new VehiculeEntity();
         vehicule.setBrand("Megane");
         vehicule.setFabricationDate(LocalDate.of(2025, 1, 1));
-        vehicule.setFuelType(FuelType.ELECTRIC);
-        vehicule.setAccessories(List.of(new Accessory(), new Accessory()));
+        vehicule.setFuelType(FuelTypeEnum.ELECTRIC);
+        vehicule.setAccessories(List.of(new AccessoryEntity(), new AccessoryEntity()));
 
         vehicule = vehiculeRepository.save(vehicule);
 
         //Recherche
-        Optional<Vehicule> expected = vehiculeRepository.findById(vehicule.getId());
+        Optional<VehiculeEntity> expected = vehiculeRepository.findById(vehicule.getId());
 
         //Verif
         assertThat(expected.isPresent());
         assertThat(expected.get().getBrand()).isEqualTo("Megane");
         assertThat(expected.get().getFabricationDate()).isEqualTo(LocalDate.of(2025, 1, 1));
-        assertThat(expected.get().getFuelType()).isEqualTo((FuelType.ELECTRIC));
+        assertThat(expected.get().getFuelType()).isEqualTo((FuelTypeEnum.ELECTRIC));
         assertThat(expected.get().getAccessories()).hasSize(2);
 
     }
@@ -45,13 +45,13 @@ public class VehiculeRepositoryTest {
     @Test
     void testFindVehiculeById(){
 
-        Vehicule vehicule = new Vehicule();
+        VehiculeEntity vehicule = new VehiculeEntity();
         vehicule.setBrand("Megane");
 
         vehicule = vehiculeRepository.save(vehicule);
 
         //Recherche
-        Optional<Vehicule> expected = vehiculeRepository.findById(vehicule.getId());
+        Optional<VehiculeEntity> expected = vehiculeRepository.findById(vehicule.getId());
 
         //Verif
         assertThat(expected.isPresent());
@@ -63,16 +63,16 @@ public class VehiculeRepositoryTest {
     @Test
     void testDeleteVehicule(){
 
-        Vehicule vehicule = new Vehicule();
+        VehiculeEntity vehicule = new VehiculeEntity();
         vehicule.setBrand("Megane");
 
-        Vehicule created = vehiculeRepository.save(vehicule);
+        VehiculeEntity created = vehiculeRepository.save(vehicule);
 
         //Delete
         vehiculeRepository.delete(created);
 
         //Verif
-        Optional<Vehicule> expected = vehiculeRepository.findById(vehicule.getId());
+        Optional<VehiculeEntity> expected = vehiculeRepository.findById(vehicule.getId());
 
         assertThat(expected.isEmpty());
 

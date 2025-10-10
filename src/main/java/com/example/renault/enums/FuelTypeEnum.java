@@ -1,6 +1,6 @@
 package com.example.renault.enums;
 
-public enum FuelType {
+public enum FuelTypeEnum {
     GASOLINE,
     DIESEL,
     ELECTRIC,

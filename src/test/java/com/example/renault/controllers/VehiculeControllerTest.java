@@ -1,7 +1,7 @@
 package com.example.renault.controllers;
 
 import com.example.renault.dto.VehiculeDTO;
-import com.example.renault.entities.Vehicule;
+import com.example.renault.entities.VehiculeEntity;
 import com.example.renault.mapper.VehiculeMapper;
 import com.example.renault.services.VehiculeService;
 import org.junit.jupiter.api.Test;
@@ -50,7 +50,7 @@ public class VehiculeControllerTest {
     void testSearchByGarage() throws Exception {
         Long garageId = 1L;
 
-        Vehicule vehicule = new Vehicule();
+        VehiculeEntity vehicule = new VehiculeEntity();
         vehicule.setId(1L);
         vehicule.setBrand("CLIO");
         vehicule.setFabricationDate(LocalDate.of(2020, 1, 1));

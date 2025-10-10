@@ -1,8 +1,8 @@
 package com.example.renault.controllers;
 
 import com.example.renault.dto.VehiculeDTO;
-import com.example.renault.entities.Garage;
-import com.example.renault.entities.Vehicule;
+import com.example.renault.entities.GarageEntity;
+import com.example.renault.entities.VehiculeEntity;
 import com.example.renault.mapper.VehiculeMapper;
 import com.example.renault.services.VehiculeService;
 import org.springframework.http.HttpStatus;
@@ -43,9 +43,8 @@ public class VehiculeController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id){
-        return vehiculeService.delete(id)
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.notFound().build();
+        vehiculeService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/garage/{id}")
@@ -59,7 +58,7 @@ public class VehiculeController {
     @GetMapping("/brand/{brand}/group-by-garage")
     public ResponseEntity<Map<Long, List<VehiculeDTO>>> getVehiculesByBrandGrouped(@PathVariable String brand) {
         try {
-            Map<Garage, List<Vehicule>> result =
+            Map<GarageEntity, List<VehiculeEntity>> result =
                     vehiculeService.findVehiculeByModelGroupByGarage(brand);
 
             Map<Long, List<VehiculeDTO>> dtoResult = result.entrySet().stream()

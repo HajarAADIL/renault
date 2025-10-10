@@ -2,9 +2,9 @@ package com.example.renault.mapper;
 
 import com.example.renault.dto.GarageDTO;
 import com.example.renault.dto.OpeningTimeDTO;
-import com.example.renault.entities.Garage;
-import com.example.renault.entities.OpeningTime;
-import com.example.renault.entities.Openings;
+import com.example.renault.entities.GarageEntity;
+import com.example.renault.entities.OpeningTimeEntity;
+import com.example.renault.entities.OpeningsEntity;
 import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
@@ -21,10 +21,10 @@ public class GarageMapper {
         this.vehiculeMapper = vehiculeMapper;
     }
 
-    public GarageDTO toDTO(Garage garage) {
+    public GarageDTO toDTO(GarageEntity garage) {
         Map<DayOfWeek, List<OpeningTimeDTO>> map = garage.getOpeningTimes().stream()
                 .collect(Collectors.toMap(
-                        Openings::getDayOfWeek, // suppose que Openings a un champ `DayOfWeek dayOfWeek`
+                        OpeningsEntity::getDayOfWeek, // suppose que Openings a un champ `DayOfWeek dayOfWeek`
                         openings -> openings.getOpeningTimes().stream()
                                 .map(t -> new OpeningTimeDTO(t.getStartTime(), t.getEndTime()))
                                 .toList()
@@ -39,18 +39,18 @@ public class GarageMapper {
                 vehiculeMapper.toDTO(garage.getVehicules()));
     }
 
-    public Garage toEntity(GarageDTO dto) {
-        Garage g = new Garage();
+    public GarageEntity toEntity(GarageDTO dto) {
+        GarageEntity g = new GarageEntity();
         g.setId(dto.id());
         g.setName(dto.name());
         g.setPhone(dto.phone());
         g.setAddress(dto.address());
         g.setEmail(dto.email());
         dto.openingTimes().forEach((key, value) -> {
-            Openings o = new Openings();
+            OpeningsEntity o = new OpeningsEntity();
             o.setDayOfWeek(key);
             o.setOpeningTimes(value.stream()
-                    .map(opening -> new OpeningTime(opening.startTime(), opening.endTime()))
+                    .map(opening -> new OpeningTimeEntity(opening.startTime(), opening.endTime()))
                     .toList());
             g.addOpening(o);
         });

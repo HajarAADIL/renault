@@ -1,8 +1,10 @@
 package com.example.renault.services;
 
-import com.example.renault.entities.Garage;
-import com.example.renault.enums.FuelType;
+import com.example.renault.entities.GarageEntity;
+import com.example.renault.entities.VehiculeEntity;
+import com.example.renault.enums.FuelTypeEnum;
 import com.example.renault.repositories.GarageRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,11 +23,11 @@ public class GarageService {
         this.garageRepository = garageRepository;
     }
 
-    public Garage create(Garage garage) {
+    public GarageEntity create(GarageEntity garage) {
         return garageRepository.save(garage);
     }
 
-    public Optional<Garage> update(Long id, Garage garage) {
+    public Optional<GarageEntity> update(Long id, GarageEntity garage) {
         return garageRepository.findById(id)
                 .map(old -> {
                     old.setName(garage.getName());
@@ -43,27 +45,26 @@ public class GarageService {
                 });
     }
 
-    public boolean delete(Long id) {
-        if (garageRepository.existsById(id)) {
-            garageRepository.deleteById(id);
-            return true;
-        }
-        return false;
+    public void delete(Long id) {
+        GarageEntity garage = garageRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Garage not found with id " + id));
+        garageRepository.delete(garage);
     }
 
-    public Optional<Garage> findById(Long id){
+    public Optional<GarageEntity> findById(Long id){
         return garageRepository.findById(id);
     }
 
-    public Page<Garage> findAll(Pageable pageable) {
+    public Page<GarageEntity> findAll(Pageable pageable) {
         return garageRepository.findAll(pageable);
     }
 
-    public List<Garage> findGarageByVehiculeType(FuelType fuelType){
+    public List<GarageEntity> findGarageByVehiculeType(FuelTypeEnum fuelType){
         return garageRepository.findByFuelType(fuelType);
     }
 
-    public List<Garage> findGaragesByAccessory(String accessoryName){
+    public List<GarageEntity> findGaragesByAccessory(String accessoryName){
         return garageRepository.findByAccessoryId(accessoryName);
     }
 

@@ -1,8 +1,8 @@
 package com.example.renault.services;
 
 import com.example.renault.dto.VehiculeDTO;
-import com.example.renault.entities.Garage;
-import com.example.renault.entities.Vehicule;
+import com.example.renault.entities.GarageEntity;
+import com.example.renault.entities.VehiculeEntity;
 import com.example.renault.mapper.VehiculeMapper;
 import com.example.renault.repositories.GarageRepository;
 import com.example.renault.repositories.VehiculeRepository;
@@ -39,7 +39,7 @@ public class VehiculeService {
     }
 
     public VehiculeDTO create(VehiculeDTO vehiculeDto) {
-        Garage garage = garageRepository.findById(vehiculeDto.garageId())
+        GarageEntity garage = garageRepository.findById(vehiculeDto.garageId())
                 .orElseThrow(() -> new EntityNotFoundException("Garage not found"));
 
         //RG: Chaque garage peut stocker au maximum 50 véhicules.
@@ -49,11 +49,11 @@ public class VehiculeService {
                     String.format("The garage %s has reached the maximum number of vehicles.", garage.getName()));
 
 
-        Vehicule vehicule = vehiculeMapper.toEntity(vehiculeDto);
+        VehiculeEntity vehicule = vehiculeMapper.toEntity(vehiculeDto);
         vehicule.setGarage(garage);
 
         //Save
-        Vehicule created = vehiculeRepository.save(vehicule);
+        VehiculeEntity created = vehiculeRepository.save(vehicule);
 
         // Publish the event to Kafka (simplified JSON)
         String eventMessage = String.format("{\"id\":%d,\"model\":\"%s\",\"brand\":\"%s\",\"type\":%s,\"garageId\":%d}",
@@ -66,7 +66,7 @@ public class VehiculeService {
     }
 
     public Optional<VehiculeDTO> update(Long id, VehiculeDTO vehicule) {
-        Garage garage = garageRepository.findById(vehicule.garageId())
+        GarageEntity garage = garageRepository.findById(vehicule.garageId())
                 .orElseThrow(() -> new EntityNotFoundException("Garage not found"));
 
 
@@ -81,24 +81,23 @@ public class VehiculeService {
                 });
     }
 
-    public boolean delete(Long id) {
-        if (vehiculeRepository.existsById(id)) {
-            vehiculeRepository.deleteById(id);
-            return true;
-        }
-        return false;
+    public void delete(Long id) {
+        VehiculeEntity vehicule = vehiculeRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Vehicule not found with id " + id));
+        vehiculeRepository.delete(vehicule);
     }
 
-    public List<Vehicule> findByGarageId(Long garageId) {
+    public List<VehiculeEntity> findByGarageId(Long garageId) {
         return vehiculeRepository.findByGarageId(garageId);
     }
 
-    public Map<Garage, List<Vehicule>> findVehiculeByModelGroupByGarage(String brand){
-        List<Vehicule> vehicules = vehiculeRepository.findByBrand(brand);
+    public Map<GarageEntity, List<VehiculeEntity>> findVehiculeByModelGroupByGarage(String brand){
+        List<VehiculeEntity> vehicules = vehiculeRepository.findByBrand(brand);
 
         if(CollectionUtils.isEmpty(vehicules))
             throw  new IllegalArgumentException(String.format("Vehicules with brand %s not found", brand));
 
-        return vehicules.stream().collect(Collectors.groupingBy(Vehicule::getGarage));
+        return vehicules.stream().collect(Collectors.groupingBy(VehiculeEntity::getGarage));
     }
 }

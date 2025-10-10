@@ -1,7 +1,6 @@
 package com.example.renault.controllers;
 
 import com.example.renault.dto.AccessoryDTO;
-import com.example.renault.entities.Accessory;
 import com.example.renault.services.AccessoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,9 +34,8 @@ public class AccessoryController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id){
-        return accessoryService.delete(id)
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.notFound().build();
+        accessoryService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/vehicule/{id}")

@@ -1,6 +1,6 @@
 package com.example.renault.enums;
 
-public enum AccessoryType {
+public enum AccessoryTypeEnum {
     SECURITY,
     CONFORT,
     EMERGENCY

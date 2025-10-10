@@ -1,6 +1,6 @@
 package com.example.renault.services;
 
-import com.example.renault.entities.Garage;
+import com.example.renault.entities.GarageEntity;
 import com.example.renault.repositories.GarageRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,12 +31,12 @@ public class GarageServiceTest {
     void testUpdateGarage() {
 
         Long garageId = 1L;
-        Garage oldGarage = new Garage();
+        GarageEntity oldGarage = new GarageEntity();
         oldGarage.setId(garageId);
         oldGarage.setName("OldName");
         oldGarage.setOpeningTimes(Collections.emptyList());
 
-        Garage newGarage = new Garage();
+        GarageEntity newGarage = new GarageEntity();
         newGarage.setName("NewName");
         newGarage.setAddress("NewAddress");
         newGarage.setEmail("renaul@contact.com");
@@ -44,14 +44,14 @@ public class GarageServiceTest {
         newGarage.setOpeningTimes(Collections.emptyList());
 
         when(garageRepository.findById(garageId)).thenReturn(Optional.of(oldGarage));
-        when(garageRepository.save(any(Garage.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(garageRepository.save(any(GarageEntity.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Optional<Garage> result = garageService.update(garageId, newGarage);
+        Optional<GarageEntity> result = garageService.update(garageId, newGarage);
 
         assertThat(result).isPresent();
         assertThat(result.get().getName()).isEqualTo("NewName");
         assertThat(result.get().getAddress()).isEqualTo("NewAddress");
         assertThat(result.get().getEmail()).isEqualTo("renaul@contact.com");
-        verify(garageRepository, times(1)).save(any(Garage.class));
+        verify(garageRepository, times(1)).save(any(GarageEntity.class));
     }
 }

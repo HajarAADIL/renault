@@ -1,6 +1,6 @@
 package com.example.renault.dto;
 
-import com.example.renault.enums.AccessoryType;
+import com.example.renault.enums.AccessoryTypeEnum;
 
 import java.math.BigDecimal;
 
@@ -8,6 +8,6 @@ public record AccessoryDTO(Long id,
                            String name,
                            String description,
                            BigDecimal price,
-                           AccessoryType type,
+                           AccessoryTypeEnum type,
                            Long vehiculeId) {
 }

@@ -1,8 +1,8 @@
 package com.example.renault.controllers;
 
 import com.example.renault.dto.GarageDTO;
-import com.example.renault.entities.Garage;
-import com.example.renault.enums.FuelType;
+import com.example.renault.entities.GarageEntity;
+import com.example.renault.enums.FuelTypeEnum;
 import com.example.renault.mapper.GarageMapper;
 import com.example.renault.services.GarageService;
 import org.springframework.data.domain.Page;
@@ -31,7 +31,7 @@ public class GarageController {
     @PostMapping
     public ResponseEntity<?> create(@RequestBody GarageDTO garage){
         try {
-            Garage created = garageService.create(garageMapper.toEntity(garage));
+            GarageEntity created = garageService.create(garageMapper.toEntity(garage));
             return ResponseEntity
                     .status(HttpStatus.CREATED)
                     .body(garageMapper.toDTO(created));
@@ -49,9 +49,8 @@ public class GarageController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id){
-        return garageService.delete(id)
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.notFound().build();
+        garageService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
@@ -69,7 +68,7 @@ public class GarageController {
     }
 
     @GetMapping("/vehicule/{fuelType}")
-    public ResponseEntity<List<GarageDTO>> searchByVehiculeType(@PathVariable FuelType fuelType){
+    public ResponseEntity<List<GarageDTO>> searchByVehiculeType(@PathVariable FuelTypeEnum fuelType){
         List<GarageDTO> result = garageService.findGarageByVehiculeType(fuelType)
                 .stream().map(garageMapper::toDTO).toList();
         return ResponseEntity.ok(result);
