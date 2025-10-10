@@ -42,12 +42,7 @@ public class VehiculeService {
         GarageEntity garage = garageRepository.findById(vehiculeDto.garageId())
                 .orElseThrow(() -> new EntityNotFoundException("Garage not found"));
 
-        //RG: Chaque garage peut stocker au maximum 50 véhicules.
-        long vehiculeNumber = vehiculeRepository.countByGarageId(garage.getId());
-        if(vehiculeNumber >= MAX_VEHICULE)
-            throw new IllegalArgumentException(
-                    String.format("The garage %s has reached the maximum number of vehicles.", garage.getName()));
-
+        verifyGagageVehiculeNumber(garage);
 
         VehiculeEntity vehicule = vehiculeMapper.toEntity(vehiculeDto);
         vehicule.setGarage(garage);
@@ -69,6 +64,7 @@ public class VehiculeService {
         GarageEntity garage = garageRepository.findById(vehicule.garageId())
                 .orElseThrow(() -> new EntityNotFoundException("Garage not found"));
 
+        verifyGagageVehiculeNumber(garage);
 
         return vehiculeRepository.findById(id)
                 .map(old -> {
@@ -99,5 +95,14 @@ public class VehiculeService {
             throw  new IllegalArgumentException(String.format("Vehicules with brand %s not found", brand));
 
         return vehicules.stream().collect(Collectors.groupingBy(VehiculeEntity::getGarage));
+    }
+
+    //RG: Chaque garage peut stocker au maximum 50 véhicules.
+    private void verifyGagageVehiculeNumber(GarageEntity garage) {
+
+        long vehiculeNumber = vehiculeRepository.countByGarageId(garage.getId());
+        if(vehiculeNumber >= MAX_VEHICULE)
+            throw new IllegalArgumentException(
+                    String.format("The garage %s has reached the maximum number of vehicles.", garage.getName()));
     }
 }

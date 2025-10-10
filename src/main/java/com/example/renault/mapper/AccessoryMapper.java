@@ -2,36 +2,19 @@ package com.example.renault.mapper;
 
 import com.example.renault.dto.AccessoryDTO;
 import com.example.renault.entities.AccessoryEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@Component
-public class AccessoryMapper {
-    public AccessoryDTO toDTO(AccessoryEntity accessory) {
-        return new AccessoryDTO(
-                accessory.getId(),
-                accessory.getName(),
-                accessory.getDescription(),
-                accessory.getPrice(),
-                accessory.getType(),
-                accessory.getVehicule() != null ? accessory.getVehicule().getId() : null
-        );
-    }
+@Mapper(componentModel = "spring")
+public interface AccessoryMapper {
 
-    public AccessoryEntity toEntity(AccessoryDTO dto) {
-        AccessoryEntity a = new AccessoryEntity();
-        a.setId(dto.id());
-        a.setName(dto.name());
-        a.setDescription(dto.description());
-        a.setPrice(dto.price());
-        a.setType(dto.type());
-        return a;
-    }
-    public List<AccessoryDTO> toDTO(List<AccessoryEntity> accessorys) {
-        if(CollectionUtils.isEmpty(accessorys)) return new ArrayList<>();
-        return accessorys.stream().map(this::toDTO).toList();
-    }
+    @Mapping(target = "vehiculeId", source = "vehicule.id")
+    AccessoryDTO toDTO(AccessoryEntity entity);
+
+    AccessoryEntity toEntity(AccessoryDTO dto);
+
+    List<AccessoryDTO> toDTO(List<AccessoryEntity> accessoryList);
+
 }

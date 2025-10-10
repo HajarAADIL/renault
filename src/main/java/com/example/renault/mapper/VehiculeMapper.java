@@ -1,42 +1,21 @@
 package com.example.renault.mapper;
+
 import com.example.renault.dto.VehiculeDTO;
 import com.example.renault.entities.VehiculeEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@Component
-public class VehiculeMapper {
+@Mapper(componentModel = "spring", uses = {AccessoryMapper.class})
+public interface VehiculeMapper {
 
-    private final AccessoryMapper accessoryMapper;
+    @Mapping(target = "garageId", source = "garage.id")
+    @Mapping(target = "accessories", source = "accessories")
+    VehiculeDTO toDTO(VehiculeEntity entity);
 
-    public VehiculeMapper(AccessoryMapper accessoryMapper){
-        this.accessoryMapper = accessoryMapper;
-    }
+    @Mapping(target = "accessories", ignore = true)
+    VehiculeEntity toEntity(VehiculeDTO dto);
 
-    public VehiculeDTO toDTO(VehiculeEntity vehicule) {
-        return new VehiculeDTO(
-                vehicule.getId(),
-                vehicule.getBrand(),
-                vehicule.getFabricationDate(),
-                vehicule.getFuelType(),
-                vehicule.getGarage() != null ? vehicule.getGarage().getId() : null,
-                accessoryMapper.toDTO(vehicule.getAccessories())
-        );
-    }
-
-    public VehiculeEntity toEntity(VehiculeDTO dto) {
-        VehiculeEntity v = new VehiculeEntity();
-        v.setId(dto.id());
-        v.setBrand(dto.brand());
-        v.setFabricationDate(dto.fabricationDate());
-        v.setFuelType(dto.fuelType());
-        return v;
-    }
-    public List<VehiculeDTO> toDTO(List<VehiculeEntity> vehicules) {
-       if(CollectionUtils.isEmpty(vehicules)) return new ArrayList<>();
-       return vehicules.stream().map(this::toDTO).toList();
-    }
+    List<VehiculeDTO> toDTO(List<VehiculeEntity> vehiculeList);
 }

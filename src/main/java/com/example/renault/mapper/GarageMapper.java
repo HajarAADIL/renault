@@ -5,55 +5,54 @@ import com.example.renault.dto.OpeningTimeDTO;
 import com.example.renault.entities.GarageEntity;
 import com.example.renault.entities.OpeningTimeEntity;
 import com.example.renault.entities.OpeningsEntity;
-import org.springframework.stereotype.Component;
+import org.mapstruct.AfterMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Component
-public class GarageMapper {
+@Mapper(componentModel = "spring", uses = {VehiculeMapper.class})
+public interface GarageMapper {
 
-    private final VehiculeMapper vehiculeMapper;
+    @Mapping(target = "vehicules", source = "vehicules")
+    @Mapping(target = "openingTimes", source = "openingTimes")
+    GarageDTO toDTO(GarageEntity entity);
 
-    public GarageMapper(VehiculeMapper vehiculeMapper) {
-        this.vehiculeMapper = vehiculeMapper;
-    }
+    @Mapping(target = "vehicules", ignore = true)
+    @Mapping(target = "openingTimes", source = "openingTimes")
+    GarageEntity toEntity(GarageDTO dto);
 
-    public GarageDTO toDTO(GarageEntity garage) {
-        Map<DayOfWeek, List<OpeningTimeDTO>> map = garage.getOpeningTimes().stream()
+    default Map<DayOfWeek, List<OpeningTimeDTO>> mapOpeningTimeList(List<OpeningsEntity> openingTimes) {
+        return openingTimes.stream()
                 .collect(Collectors.toMap(
-                        OpeningsEntity::getDayOfWeek, // suppose que Openings a un champ `DayOfWeek dayOfWeek`
+                        OpeningsEntity::getDayOfWeek,
                         openings -> openings.getOpeningTimes().stream()
                                 .map(t -> new OpeningTimeDTO(t.getStartTime(), t.getEndTime()))
                                 .toList()
                 ));
-
-        return new GarageDTO(garage.getId(),
-                garage.getName(),
-                garage.getAddress(),
-                garage.getPhone(),
-                garage.getEmail(),
-                map,
-                vehiculeMapper.toDTO(garage.getVehicules()));
     }
 
-    public GarageEntity toEntity(GarageDTO dto) {
-        GarageEntity g = new GarageEntity();
-        g.setId(dto.id());
-        g.setName(dto.name());
-        g.setPhone(dto.phone());
-        g.setAddress(dto.address());
-        g.setEmail(dto.email());
-        dto.openingTimes().forEach((key, value) -> {
-            OpeningsEntity o = new OpeningsEntity();
-            o.setDayOfWeek(key);
-            o.setOpeningTimes(value.stream()
-                    .map(opening -> new OpeningTimeEntity(opening.startTime(), opening.endTime()))
-                    .toList());
-            g.addOpening(o);
-        });
-        return g;
+    default List<OpeningsEntity> mapOpeningTimeList(Map<DayOfWeek, List<OpeningTimeDTO>> openingTimes) {
+        if(openingTimes == null) return null;
+        return openingTimes.entrySet().stream()
+                .map(entry -> {
+                    OpeningsEntity o = new OpeningsEntity();
+                    o.setDayOfWeek(entry.getKey());
+                    o.setOpeningTimes(entry.getValue().stream()
+                            .map(opening -> new OpeningTimeEntity(opening.startTime(), opening.endTime()))
+                            .toList());
+                    return o;
+        }).toList();
+    }
+
+    @AfterMapping
+    default void linkGarage(@MappingTarget GarageEntity garage) {
+        if (garage.getOpeningTimes() != null) {
+            garage.getOpeningTimes().forEach(o -> o.setGarage(garage));
+        }
     }
 }

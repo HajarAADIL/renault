@@ -10,13 +10,13 @@ import java.util.List;
 
 public interface GarageRepository extends JpaRepository<GarageEntity, Long> {
 
-    @Query("SELECT DISTINCT g FROM Garage g " +
+    @Query("SELECT DISTINCT g FROM GarageEntity g " +
             "JOIN g.vehicules v " +
             "JOIN v.accessories a " +
             "WHERE a.name = :accessoryName")
     List<GarageEntity> findByAccessoryId(@Param("accessoryName") String accessoryName);
 
-    @Query("SELECT DISTINCT g FROM Garage g " +
+    @Query("SELECT DISTINCT g FROM GarageEntity g " +
             "JOIN g.vehicules v " +
             "WHERE v.fuelType = :fuel")
     List<GarageEntity> findByFuelType(@Param("fuel") FuelTypeEnum fuelType);
