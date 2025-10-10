@@ -52,18 +52,22 @@ public class GarageService {
         garageRepository.delete(garage);
     }
 
+    @Transactional(readOnly = true)
     public Optional<GarageEntity> findById(Long id){
         return garageRepository.findById(id);
     }
 
+    @Transactional(readOnly = true)
     public Page<GarageEntity> findAll(Pageable pageable) {
         return garageRepository.findAll(pageable);
     }
 
+    @Transactional(readOnly = true)
     public List<GarageEntity> findGarageByVehiculeType(FuelTypeEnum fuelType){
         return garageRepository.findByFuelType(fuelType);
     }
 
+    @Transactional(readOnly = true)
     public List<GarageEntity> findGaragesByAccessory(String accessoryName){
         return garageRepository.findByAccessoryId(accessoryName);
     }

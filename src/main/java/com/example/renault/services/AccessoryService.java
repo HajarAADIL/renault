@@ -61,7 +61,7 @@ public class AccessoryService {
         accessoryRepository.delete(accessory);
     }
 
-
+    @Transactional(readOnly = true)
     public List<AccessoryDTO> findByVehiculeId(Long garageId) {
         return accessoryMapper.toDTO(accessoryRepository.findByVehiculeId(garageId));
     }

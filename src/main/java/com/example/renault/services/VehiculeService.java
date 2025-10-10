@@ -84,10 +84,12 @@ public class VehiculeService {
         vehiculeRepository.delete(vehicule);
     }
 
+    @Transactional(readOnly = true)
     public List<VehiculeEntity> findByGarageId(Long garageId) {
         return vehiculeRepository.findByGarageId(garageId);
     }
 
+    @Transactional(readOnly = true)
     public Map<GarageEntity, List<VehiculeEntity>> findVehiculeByModelGroupByGarage(String brand){
         List<VehiculeEntity> vehicules = vehiculeRepository.findByBrand(brand);
 
@@ -98,6 +100,7 @@ public class VehiculeService {
     }
 
     //RG: Chaque garage peut stocker au maximum 50 véhicules.
+    @Transactional(readOnly = true)
     private void verifyGagageVehiculeNumber(GarageEntity garage) {
 
         long vehiculeNumber = vehiculeRepository.countByGarageId(garage.getId());

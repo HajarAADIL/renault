@@ -1,29 +1,26 @@
 package com.example.renault.controllers;
 
-import com.example.renault.dto.GarageDTO;
-import com.example.renault.entities.Garage;
+import com.example.renault.builders.GarageBuilder;
 import com.example.renault.mapper.GarageMapper;
 import com.example.renault.services.GarageService;
+import io.restassured.module.mockmvc.RestAssuredMockMvc;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.MediaType;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.equalTo;
 
 @WebMvcTest(GarageController.class)
 public class GarageControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
 
     @Autowired
     private GarageService garageService;
@@ -44,23 +41,43 @@ public class GarageControllerTest {
         }
     }
 
+    @BeforeEach
+    void setup() {
+        RestAssuredMockMvc.standaloneSetup(new GarageController(garageService, garageMapper));
+    }
+
     @Test
-    void testSearchById() throws Exception {
+    void shouldReturnGarageWhenFoundById() {
 
-        Long garageId = 1L;
-        Garage garage = new Garage();
-        garage.setId(garageId);
-        garage.setName("Bouskoura Garage");
+        var garageId = 1L;
+        var garageEntity = GarageBuilder.aGarage().build();
 
-        GarageDTO dto = new GarageDTO(garageId, "Bouskoura Garage", "Address", "123456","email@test.com", null , null);
+        var garageDTO = GarageBuilder.aGarage().buildDto();
 
-        when(garageService.findById(garageId)).thenReturn(Optional.of(garage));
-        when(garageMapper.toDTO(garage)).thenReturn(dto);
+        when(garageService.findById(garageId)).thenReturn(Optional.of(garageEntity));
+        when(garageMapper.toDTO(garageEntity)).thenReturn(garageDTO);
 
-        // when & then
-        mockMvc.perform(get("/garages/{id}", garageId)
-                        .accept(String.valueOf(MediaType.APPLICATION_JSON)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Bouskoura Garage"));
+        RestAssuredMockMvc.given()
+                    .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .get("/garages/{id}", garageId)
+                .then()
+                    .status(HttpStatus.OK)
+                    .body("name", equalTo("Bouskoura Garage"));
+
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenGarageDontExist() {
+        var nonExistentId = 99L;
+        when(garageService.findById(nonExistentId)).thenReturn(Optional.empty());
+
+        RestAssuredMockMvc.given()
+                    .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .get("/garages/{id}", nonExistentId)
+                .then()
+                    .status(HttpStatus.NOT_FOUND);
+
     }
 }

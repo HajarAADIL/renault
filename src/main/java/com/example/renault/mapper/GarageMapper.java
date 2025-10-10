@@ -27,6 +27,7 @@ public interface GarageMapper {
     GarageEntity toEntity(GarageDTO dto);
 
     default Map<DayOfWeek, List<OpeningTimeDTO>> mapOpeningTimeList(List<OpeningsEntity> openingTimes) {
+        if(openingTimes == null) return null;
         return openingTimes.stream()
                 .collect(Collectors.toMap(
                         OpeningsEntity::getDayOfWeek,

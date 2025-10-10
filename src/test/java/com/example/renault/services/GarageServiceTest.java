@@ -1,5 +1,6 @@
 package com.example.renault.services;
 
+import com.example.renault.builders.GarageBuilder;
 import com.example.renault.entities.GarageEntity;
 import com.example.renault.repositories.GarageRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,30 +28,27 @@ public class GarageServiceTest {
     }
 
     @Test
-    void testUpdateGarage() {
+    void shouldUpdateGarageSuccessfully() {
 
-        Long garageId = 1L;
-        GarageEntity oldGarage = new GarageEntity();
-        oldGarage.setId(garageId);
-        oldGarage.setName("OldName");
-        oldGarage.setOpeningTimes(Collections.emptyList());
+        var garageId = 1L;
+        var existingGarage = GarageBuilder.aGarage().build();
 
-        GarageEntity newGarage = new GarageEntity();
-        newGarage.setName("NewName");
-        newGarage.setAddress("NewAddress");
-        newGarage.setEmail("renaul@contact.com");
-        newGarage.setVehicules(Collections.emptyList());
-        newGarage.setOpeningTimes(Collections.emptyList());
+        GarageEntity updatedGarage = GarageBuilder.aGarage()
+                .withName("Oasis Garage")
+                .withAddress("New Address")
+                .build();
 
-        when(garageRepository.findById(garageId)).thenReturn(Optional.of(oldGarage));
-        when(garageRepository.save(any(GarageEntity.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(garageRepository.findById(garageId)).thenReturn(Optional.of(existingGarage));
+        when(garageRepository.save(any(GarageEntity.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
 
-        Optional<GarageEntity> result = garageService.update(garageId, newGarage);
+        var result = garageService.update(garageId, updatedGarage);
 
         assertThat(result).isPresent();
-        assertThat(result.get().getName()).isEqualTo("NewName");
-        assertThat(result.get().getAddress()).isEqualTo("NewAddress");
-        assertThat(result.get().getEmail()).isEqualTo("renaul@contact.com");
+
+        var garage = result.get();
+        assertThat(garage.getName()).isEqualTo("Oasis Garage");
+        assertThat(garage.getAddress()).isEqualTo("New Address");
         verify(garageRepository, times(1)).save(any(GarageEntity.class));
     }
 }

@@ -1,5 +1,6 @@
 package com.example.renault.services;
 
+import com.example.renault.builders.AccessoryBuilder;
 import com.example.renault.repositories.AccessoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,7 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Optional;
+
 import static org.mockito.Mockito.*;
 
 public class AccessoryServiceTest {
@@ -24,14 +26,17 @@ public class AccessoryServiceTest {
     }
 
     @Test
-    void testDeleteAccessory() {
+    void shouldDeleteAccessorySuccessfully() {
 
-        Long id = 1L;
-        when(accessoryRepository.existsById(id)).thenReturn(true);
+        var id = 1L;
+        var accessory = AccessoryBuilder.anAccessory().build();
 
-        //boolean result = accessoryService.delete(id);
+        when(accessoryRepository.findById(id)).thenReturn(Optional.of(accessory));
+
+        accessoryService.delete(id);
 
         //assertThat(result).isTrue();
-        verify(accessoryRepository, times(1)).deleteById(id);
+        verify(accessoryRepository).findById(id);
+        verify(accessoryRepository).delete(accessory);
     }
 }

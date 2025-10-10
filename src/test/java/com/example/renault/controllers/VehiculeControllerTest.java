@@ -1,30 +1,28 @@
 package com.example.renault.controllers;
 
-import com.example.renault.dto.VehiculeDTO;
-import com.example.renault.entities.VehiculeEntity;
+import com.example.renault.builders.GarageBuilder;
+import com.example.renault.builders.VehiculeBuilder;
+import com.example.renault.enums.FuelTypeEnum;
 import com.example.renault.mapper.VehiculeMapper;
 import com.example.renault.services.VehiculeService;
+import io.restassured.module.mockmvc.RestAssuredMockMvc;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.MediaType;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
-import java.time.LocalDate;
-import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.equalTo;
 
 @WebMvcTest(VehiculeController.class)
 public class VehiculeControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
 
     @Autowired
     private VehiculeService vehiculeService;
@@ -46,31 +44,49 @@ public class VehiculeControllerTest {
         }
     }
 
+    @BeforeEach
+    void setup() {
+        RestAssuredMockMvc.standaloneSetup(new VehiculeController(vehiculeService, vehiculeMapper));
+    }
+
     @Test
-    void testSearchByGarage() throws Exception {
-        Long garageId = 1L;
+    void shouldUpdateVehiculeWhenChangeBrandGarage() throws Exception {
 
-        VehiculeEntity vehicule = new VehiculeEntity();
-        vehicule.setId(1L);
-        vehicule.setBrand("CLIO");
-        vehicule.setFabricationDate(LocalDate.of(2020, 1, 1));
+        var garage = GarageBuilder.aGarage().withId(10L).withName("Ville Verte Garage").build();
+        var vehiculeId = 1L;
 
-        VehiculeDTO dto = new VehiculeDTO(
-                vehicule.getId(),
-                vehicule.getBrand(),
-                vehicule.getFabricationDate(),
-                vehicule.getFuelType(),
-                garageId,
-                null
-        );
+        var updatedVehiculeDTO = VehiculeBuilder.aVehicule().withId(vehiculeId).withBrand("Clio 5").withGarage(garage).buildDto();
 
-        when(vehiculeService.findByGarageId(garageId)).thenReturn(List.of(vehicule));
-        when(vehiculeMapper.toDTO(vehicule)).thenReturn(dto);
+        when(vehiculeService.update(vehiculeId, updatedVehiculeDTO)).thenReturn(Optional.of(updatedVehiculeDTO));
 
-        mockMvc.perform(get("/vehicules/garage/{id}", garageId)
-                        .accept(String.valueOf(MediaType.APPLICATION_JSON)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].brand").value("CLIO"))
-                .andExpect(jsonPath("$[0].id").value(1));
+        RestAssuredMockMvc.given()
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .body(updatedVehiculeDTO)
+                .when()
+                    .put("/vehicules/{id}", vehiculeId)
+                .then()
+                    .status(HttpStatus.OK)
+                    .body("brand",equalTo("Clio 5"))
+                    .body("fuelType", equalTo(FuelTypeEnum.DIESEL.name())) //unchanged
+                    .body("garageId", equalTo(10));
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenVehiculeDontExist(){
+        var nonExistentId = 99L;
+
+        var updateVehicule = VehiculeBuilder.aVehicule().withId(nonExistentId).build();
+
+        var updateVehiculeDTO = VehiculeBuilder.aVehicule().buildDto();
+
+        when(vehiculeService.update(nonExistentId, updateVehiculeDTO)).thenReturn(Optional.empty());
+
+        RestAssuredMockMvc.given()
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .body(updateVehiculeDTO)
+                .when()
+                    .put("/vehicules/{id}", nonExistentId)
+                .then()
+                    .status(HttpStatus.NOT_FOUND);
     }
 }
